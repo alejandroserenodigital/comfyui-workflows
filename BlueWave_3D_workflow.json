@@ -1,0 +1,72 @@
+{
+  "1": {
+    "class_type": "Load3DModelPro",
+    "inputs": {
+      "model_file": "swimming_pool.glb",
+      "up_direction": "Y",
+      "custom_path": "",
+      "scale": 1.0,
+      "center_model": true,
+      "auto_scale": true,
+      "width": 1024,
+      "height": 1024,
+      "bg_transparent": false
+    }
+  },
+  "2": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "your_model.safetensors"
+    }
+  },
+  "3": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "above ground swimming pool in a beautiful backyard, lush green grass, sunny day, lifestyle photography, photorealistic",
+      "clip": ["2", 1]
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "ugly, blurry, distorted, low quality",
+      "clip": ["2", 1]
+    }
+  },
+  "5": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": ["1", 1],
+      "vae": ["2", 2]
+    }
+  },
+  "6": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": ["2", 0],
+      "positive": ["3", 0],
+      "negative": ["4", 0],
+      "latent_image": ["5", 0],
+      "seed": 42,
+      "steps": 30,
+      "cfg": 7.0,
+      "sampler_name": "euler",
+      "scheduler": "karras",
+      "denoise": 0.75
+    }
+  },
+  "7": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": ["6", 0],
+      "vae": ["2", 2]
+    }
+  },
+  "8": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "BlueWave_3D_Scene",
+      "images": ["7", 0]
+    }
+  }
+}
